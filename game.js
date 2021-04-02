@@ -34,6 +34,22 @@ let monsters = [
 	{ x: 300, y: 300 },
 ];
 
+
+// Scoreboard
+
+const applicationState = {
+	isGameOver: false,
+	currentUser: '',
+	highScore: {
+		score: 0,
+		user: '',
+		date: '',
+	},
+	gameHistory: [{ user: '', score: 0, date: '' }],
+};
+
+console.log({applicationState});
+
 let startTime = Date.now();
 const SECONDS_PER_ROUND = 30;
 let elapsedTime = 0;
@@ -90,6 +106,17 @@ function setupKeyboardListeners() {
 	);
 }
 
+function randomlyPlace(axis) {
+	// const maximum = axis === 'x' ? canvas.width : canvas.height
+	// var randomnumber = Math.floor(Math.random() * (maximum - 0 + 1)) + 0;
+
+	// return randomnumber
+	if (axis === 'x') {
+		return Math.floor(Math.random() * canvas.width + 1);
+	} else {
+		return Math.floor(Math.random() * canvas.height + 1);
+	}
+}
 /**
  *  Update game objects - change player position based on key pressed
  *  and check to see if the monster has been caught!
@@ -116,11 +143,16 @@ let update = function () {
 	// Check if player and monster collided. Our images
 	// are 32 pixels big.
 	monsters.forEach((monster) => {
-		if (hero.x <= monster.x + 32 && monster.x <= hero.x + 32 && hero.y <= monster.y + 32 && monster.y <= hero.y + 32) {
-			// Pick a new location for the monster.
-			// Note: Change this to place the monster at a new, random location.
-			monster.x = monster.x + 50;
-			monster.y = monster.y + 70;
+		const monsterCaughtbyHero =
+			hero.x <= monster.x + 32 &&
+			monster.x <= hero.x + 32 &&
+			hero.y <= monster.y + 32 &&
+			monster.y <= hero.y + 32;
+		if (monsterCaughtbyHero) {
+			monster.x = randomlyPlace('x');
+			monster.y = randomlyPlace('y');
+			applicationState.highScore.score++
+			console.log({applicationState})
 		}
 	});
 };
@@ -160,6 +192,41 @@ function main() {
 // Safely ignore this line. It's mostly here for people with old web browsers.
 var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+
+
+document.getElementById("sign-in").addEventListener('click', function(){
+	console.log('click')
+	applicationState.currentUser = document.getElementById("username").value
+	document.getElementById("username").value = ''
+	localStorage.setItem('User', applicationState.currentUser)
+
+	document.getElementById("signin-form").style.display = 'none'
+	document.getElementById("signout-form").style.display = 'block'
+	document.getElementById('username-prompt').innerHTML = applicationState.currentUser
+	console.log({applicationState})
+});
+
+document.getElementById("sign-out").addEventListener('click', function(){
+
+	localStorage.removeItem('User')
+
+	document.getElementById("signout-form").style.display = 'none'
+	document.getElementById("signin-form").style.display = 'block'
+	document.getElementById('username-prompt').innerHTML = applicationState.currentUser
+	console.log({applicationState})
+});
+
+function checkifloggedin(){
+	const username = localStorage.getItem('User');
+	console.log({username});
+	if(username){
+		document.getElementById("signin-form").style.display = 'none';
+		document.getElementById("username-prompt").innerHTML = applicationState.currentUser
+		document.getElementById("signout-form").style.display = 'block'
+	}
+}
+
+
 
 // Let's play this game!
 loadImages();
