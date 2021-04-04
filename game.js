@@ -27,11 +27,21 @@ let bg = {};
  *
  */
 
+ var lives = 3;
+
 let hero = { x: canvas.width / 2, y: canvas.height / 2 };
 let monsters = [
 	{ x: 100, y: 100 },
 	{ x: 200, y: 200 },
 	{ x: 300, y: 300 },
+	{ x: 400, y: 400 },
+	{ x: 400, y: 100 },
+	{ x: 100, y: 400 },
+];
+
+let potion = [
+	{ x: 200, y: 100 },
+	{ x: 200, y: 400 },
 ];
 
 
@@ -40,18 +50,14 @@ let monsters = [
 const applicationState = {
 	isGameOver: false,
 	currentUser: '',
-	highScore: {
-		score: 0,
-		user: '',
-		date: '',
-	},
+	highScore: '123',
 	gameHistory: [{ user: '', score: 0, date: '' }],
 };
 
-console.log({applicationState});
+console.log({ applicationState });
 
 let startTime = Date.now();
-const SECONDS_PER_ROUND = 30;
+const SECONDS_PER_ROUND = 15;
 let elapsedTime = 0;
 
 function loadImages() {
@@ -76,6 +82,15 @@ function loadImages() {
 			monster.ready = true;
 		};
 		monster.image.src = `images/monster_${i + 1}.png`;
+	});
+
+	potion.forEach((potion, i) => {
+		potion.image = new Image();
+		potion.image.onload = function () {
+			// show the potion image
+			potion.ready = true;
+		};
+		potion.image.src = `images/potion_${i + 1}.png`;
 	});
 }
 
@@ -125,7 +140,16 @@ function randomlyPlace(axis) {
  */
 let update = function () {
 	// Update the time.
+	var finish = false
+
 	elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+
+	if (elapsedTime <= 0) {
+		finish = true
+		monsterReady=false;
+     	heroReady=false;
+
+	}
 
 	if (keysPressed['ArrowUp']) {
 		hero.y -= 5;
@@ -140,6 +164,22 @@ let update = function () {
 		hero.x += 5;
 	}
 
+	const offcanvasleft = hero.x <= 0
+	const offcanvasright = hero.x >= canvas.width
+	if(offcanvasleft){
+		hero.x = canvas.width
+	} else if(offcanvasright){
+		hero.x = 0
+	}
+
+	const offcanvastop = hero.y <=0
+	const offcanvasbot = hero.y >= canvas.height
+	if(offcanvastop){
+		hero.y = canvas.height
+	} else if(offcanvasbot){
+		hero.y = 0
+	}
+
 	// Check if player and monster collided. Our images
 	// are 32 pixels big.
 	monsters.forEach((monster) => {
@@ -152,15 +192,43 @@ let update = function () {
 			monster.x = randomlyPlace('x');
 			monster.y = randomlyPlace('y');
 			applicationState.highScore.score++
+			applicationState.gameHistory.score++
 			console.log({applicationState})
 		}
 	});
+
+	potion.forEach((potion) => {
+		const potionCaughtbyHero =
+			hero.x <= potion.x + 32 &&
+			potion.x <= hero.x + 32 &&
+			hero.y <= potion.y + 32 &&
+			potion.y <= hero.y + 32;
+		if (potionCaughtbyHero) {
+			potion.x = randomlyPlace('x');
+			potion.y = randomlyPlace('y');
+			// hero.y -= 20;
+			// hero.y += 20;
+			// hero.x -= 20;
+			// hero.x += 20;
+		}
+	});
+
+
 };
+
+function drawLives() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#black";
+    ctx.fillText("Lives: "+lives, canvas.width/3, canvas.height/3);
+}
+
 
 /**
  * This function, render, runs as often as possible.
  */
 function render() {
+	
+	
 	if (bg.ready) {
 		ctx.drawImage(bg.image, 0, 0);
 	}
@@ -172,7 +240,14 @@ function render() {
 			ctx.drawImage(monster.image, monster.x, monster.y);
 		}
 	});
+	potion.forEach((potion) => {
+		if (potion.ready) {
+			ctx.drawImage(potion.image, potion.x, potion.y);
+		}
+	});
+	
 	ctx.fillText(`Seconds Remaining: ${SECONDS_PER_ROUND - elapsedTime}`, 20, 100);
+	
 }
 
 /**
@@ -180,7 +255,9 @@ function render() {
  * update (updates the state of the game, in this case our hero and monster)
  * render (based on the state of our game, draw the right things)
  */
+
 function main() {
+	
 	update();
 	render();
 	// Request to do this again ASAP. This is a special method
@@ -194,7 +271,7 @@ var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
 
-document.getElementById("sign-in").addEventListener('click', function(){
+document.getElementById("sign-in").addEventListener('click', function () {
 	console.log('click')
 	applicationState.currentUser = document.getElementById("username").value
 	document.getElementById("username").value = ''
@@ -203,23 +280,23 @@ document.getElementById("sign-in").addEventListener('click', function(){
 	document.getElementById("signin-form").style.display = 'none'
 	document.getElementById("signout-form").style.display = 'block'
 	document.getElementById('username-prompt').innerHTML = applicationState.currentUser
-	console.log({applicationState})
+	console.log({ applicationState })
 });
 
-document.getElementById("sign-out").addEventListener('click', function(){
+document.getElementById("sign-out").addEventListener('click', function () {
 
 	localStorage.removeItem('User')
 
 	document.getElementById("signout-form").style.display = 'none'
 	document.getElementById("signin-form").style.display = 'block'
 	document.getElementById('username-prompt').innerHTML = applicationState.currentUser
-	console.log({applicationState})
+	console.log({ applicationState })
 });
 
-function checkifloggedin(){
+function checkifloggedin() {
 	const username = localStorage.getItem('User');
-	console.log({username});
-	if(username){
+	console.log({ username });
+	if (username) {
 		document.getElementById("signin-form").style.display = 'none';
 		document.getElementById("username-prompt").innerHTML = applicationState.currentUser
 		document.getElementById("signout-form").style.display = 'block'
@@ -227,6 +304,18 @@ function checkifloggedin(){
 }
 
 
+
+function displayscore() {
+	applicationState.highScore = document.getElementById("score-board").value
+	document.getElementById("score-board").value = ''
+	localStorage.setItem('Myscore', applicationState.highScore)
+
+	console.log({applicationState})
+	const scores = localStorage.getItem('Myscore')
+	document.getElementById("display").innerHTML = scores;
+  }
+
+// var scores = localStorage.getItem('Myscore', applicationState.highScore)
 
 // Let's play this game!
 loadImages();

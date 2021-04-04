@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="stylesheet" href="style.css" />
-		<title>Best Game Ever!</title>
-	</head>
-	<body>
-		<div id="canvas"></div>
-		<div id="signin-form">
-			<input type="text" id="username">
-			<button id= "sign-in"> Sign in</button>
 
-		</div>
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="style.css" />
+	<title>Best Game Ever!</title>
+</head>
 
-		<div id="signout-form">
-			<input id="username-prompt">
-			<button id= "sign-out"> Sign out</button>
+<body>
+	<div id="canvas"></div>
+	<div id="signin-form">
+		<input type="text" id="username">
+		<button id="sign-in"> Sign in</button>
 
-		</div>
+	</div>
 
-		<script src="game.js"></script>
-	</body>
+	<div id="signout-form">
+		<p id="username-prompt"></p>
+		<button id="sign-out"> Sign out</button>
+
+	</div>
+
+	<div id="score-board">
+		<p id="display">Score Here</p>
+	</div>
+
+	<script src="game.js"></script>
+</body>
+
 </html>
