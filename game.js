@@ -60,6 +60,8 @@ let startTime = Date.now();
 const SECONDS_PER_ROUND = 15;
 let elapsedTime = 0;
 
+
+
 function loadImages() {
 	bg.image = new Image();
 
@@ -226,6 +228,9 @@ function drawLives() {
 /**
  * This function, render, runs as often as possible.
  */
+
+ 
+
 function render() {
 	
 	
@@ -312,6 +317,7 @@ function displayscore() {
 
 	console.log({applicationState})
 	const scores = localStorage.getItem('Myscore')
+	if (scores) {}
 	document.getElementById("display").innerHTML = scores;
   }
 
@@ -319,5 +325,6 @@ function displayscore() {
 
 // Let's play this game!
 loadImages();
+drawLives();
 setupKeyboardListeners();
 main();
