@@ -99,7 +99,19 @@ function changetoVND(transactions, currency, exchangerate) {
 }
 console.log(changetoVND(transactions, 'VND', usdToVND));
 
+const withdrawalTransaction = transactions.filter(function (transaction) {
+    if (transaction.type === 'withdrawal') {
+        return true
+    };
+})
+console.log(withdrawalTransaction)
 
+const depositTransaction = transactions.filter(function (transaction) {
+    if (transaction.type === 'deposit') {
+        return true
+    };
+})
+console.log(depositTransaction)
 
 // Asssignment 3
 
