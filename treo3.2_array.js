@@ -106,10 +106,20 @@ const withdrawalTransaction = transactions.filter(function (transaction) {
 })
 console.log(withdrawalTransaction)
 
+withdrawalTransaction.sort(function (transactionA, transactionB) {
+    return transactionA.amount - transactionB.amount
+})
+console.log(withdrawalTransaction)
+
 const depositTransaction = transactions.filter(function (transaction) {
     if (transaction.type === 'deposit') {
         return true
     };
+})
+console.log(depositTransaction)
+
+depositTransaction.sort(function (transactionA, transactionB) {
+    return transactionA.amount - transactionB.amount
 })
 console.log(depositTransaction)
 
